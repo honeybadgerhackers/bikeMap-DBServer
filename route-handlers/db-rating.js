@@ -1,5 +1,6 @@
 const express = require('express');
 const knex = require('../db.js');
+
 const path = 'rating';
 
 const app = express();
@@ -7,8 +8,8 @@ const app = express();
 app.use(express.json());
 
 app.get(`/${path}`, (req, res) => {
-    knex(path).select()
-    .then(console.log)
+  knex(path).select()
+    .then(res.send);
 });
 
 app.post(`/${path}`, (req, res) => {
