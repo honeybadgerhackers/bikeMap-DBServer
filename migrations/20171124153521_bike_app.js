@@ -17,7 +17,7 @@ exports.up = function(knex, Promise) {
             t.integer('id_user_account')
                 .references('id')
                 .inTable('user_account');
-            t.integer('current_rating');
+            t.decimal('current_rating');
             t.integer('favorite_count');
             t.timestamp("created_at").notNullable().defaultTo(knex.fn.now());
             t.timestamp("updated_at").notNullable().defaultTo(knex.fn.now());
@@ -27,8 +27,8 @@ exports.up = function(knex, Promise) {
             t.integer('id_route')
                 .references('id')
                 .inTable('route');
-            t.integer('lat');
-            t.integer('lng');
+            t.decimal('lat');
+            t.decimal('lng');
             t.string('street');
             t.integer('count');
             t.string('address');
@@ -41,9 +41,9 @@ exports.up = function(knex, Promise) {
             t.integer('id_route')
                 .references('id')
                 .inTable('route');
-            t.integer('mph');
+            t.decimal('mph');
             t.integer('time');
-            t.integer('distance');
+            t.decimal('distance');
             t.integer('calories');
         }),
         knex.schema.createTable('rating', (t) => {
