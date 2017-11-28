@@ -7,13 +7,11 @@ const app = express();
 app.use(express.json());
 
 app.get(`/${path}`, (req, res) => {
-    console.log('hello')
-  knex(path).select()
-    .then(res.send);
+
 });
 
 app.post(`/${path}`, (req, res) => {
-
+    
 });
 
 app.put(`/${path}`, (req, res) => {
