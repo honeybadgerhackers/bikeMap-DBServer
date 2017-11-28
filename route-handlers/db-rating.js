@@ -12,7 +12,18 @@ app.get(`/${path}`, (req, res) => {
 });
 
 app.post(`/${path}`, (req, res) => {
-
+  const { id_user_account, id_route, rating } = req.body;
+  knex.raw(
+    'update rating set rating = :rating where id_user_account = :id_user_account and id_route = :id_route',
+    { id_user_account, id_route, rating },
+  )
+    .then((result) => {
+      if (!result.rowCount) {
+        knex('rating').insert(req.body)
+          .then(res.send('updated rating'));
+      }
+      res.send('submitted rating');
+    });
 });
 
 app.put(`/${path}`, (req, res) => {
