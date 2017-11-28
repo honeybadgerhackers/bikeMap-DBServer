@@ -1,7 +1,7 @@
-require('dotenv').config()
+require('dotenv').config();
 const express = require('express');
-const db = require('./db')
-const paths = require('./route-handlers')
+const db = require('./db');
+const paths = require('./route-handlers');
 
 const app = express();
 
