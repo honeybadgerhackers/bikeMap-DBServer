@@ -25,7 +25,13 @@ app.put(`/${path}`, (req, res) => {
 });
 
 app.delete(`/${path}`, (req, res) => {
-
+  if (Object.keys(req.body).length) {
+    knex(path)
+      .where(req.body)
+      .del()
+      .then(res.send('Deleted'));
+  }
+  res.send('Please specify row');
 });
 
 module.exports = app;
