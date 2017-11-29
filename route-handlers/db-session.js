@@ -8,7 +8,9 @@ app.use(express.json());
 
 app.get(`/${path}`, (req, res) => {
   const filter = req.headers.filter ? JSON.parse(req.headers.filter) : {};
-  knex(path).where(filter).select()
+  knex(path)
+    .where(filter)
+    .select()
     .then((results) => {
       res.send(results);
     });
