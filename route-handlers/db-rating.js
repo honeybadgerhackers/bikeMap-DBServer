@@ -17,16 +17,18 @@ app.get(`/${path}`, (req, res) => {
 
 app.post(`/${path}`, (req, res) => {
   const { id_user_account, id_route, rating } = req.body;
-  knex.raw(
-    'update rating set rating = :rating where id_user_account = :id_user_account and id_route = :id_route',
-    { id_user_account, id_route, rating },
-  )
+
+  knex(path)
+    .where({ id_user_account, id_route })
+    .update({ rating })
     .then((result) => {
-      if (!result.rowCount) {
-        knex('rating').insert(req.body)
-          .then(res.send('updated rating'));
+      if (!result) {
+        knex(path)
+          .insert(req.body)
+          .then(res.send('submitted'));
+      } else {
+        res.send('updated');
       }
-      res.send('submitted rating');
     });
 });
 
