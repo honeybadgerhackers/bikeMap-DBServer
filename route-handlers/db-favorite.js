@@ -8,7 +8,9 @@ app.use(express.json());
 
 app.get(`/${path}`, (req, res) => {
   knex(path).select()
-    .then(res.send);
+    .then((ratings) => {
+      res.send(ratings);
+    });
 });
 
 app.post(`/${path}`, (req, res) => {
