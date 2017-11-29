@@ -7,9 +7,10 @@ const app = express();
 app.use(express.json());
 
 app.get(`/${path}`, (req, res) => {
-  knex(path).select()
-    .then((ratings) => {
-      res.send(ratings);
+  const filter = req.headers.filter ? JSON.parse(req.headers.filter) : {};
+  knex(path).where(filter).select()
+    .then((results) => {
+      res.send(results);
     });
 });
 
