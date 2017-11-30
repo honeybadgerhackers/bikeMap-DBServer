@@ -6,7 +6,7 @@ exports.up = function(knex, Promise) {
       t.string('first_name');
       t.string('last_name');
       t.string('picture');
-      t.string('email');
+      t.string('email').unique();
       t.timestamp("created_at").notNullable().defaultTo(knex.fn.now());
       t.timestamp("updated_at").notNullable().defaultTo(knex.fn.now());
     }),
