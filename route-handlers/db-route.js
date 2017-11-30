@@ -17,7 +17,11 @@ app.get(`/${path}`, (req, res) => {
 });
 
 app.post(`/${path}`, (req, res) => {
-    
+  knex(path)
+    .insert(req.body)
+    .then(() => {
+      res.send('Success!');
+    });
 });
 
 app.put(`/${path}`, (req, res) => {
