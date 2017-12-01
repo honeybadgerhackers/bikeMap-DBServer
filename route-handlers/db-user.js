@@ -31,11 +31,7 @@ app.post(`/${path}`, (req, res) => {
       } else {
         res.send(result);
       }
-    })
-    // .insert(req.body)
-    // .then((result) => {
-    //   res.send(result);
-    // });
+    });
 });
 
 app.put(`/${path}`, (req, res) => {
