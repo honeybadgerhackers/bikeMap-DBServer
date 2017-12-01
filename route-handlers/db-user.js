@@ -18,10 +18,24 @@ app.get(`/${path}`, (req, res) => {
 
 app.post(`/${path}`, (req, res) => {
   knex(path)
-    .insert(req.body)
+    .where(req.body)
     .then((result) => {
-      res.send(result);
-    });
+      if (result.length === 0) {
+        knex(path)
+          .insert(req.body)
+          .then(() => {
+            knex(path).where(req.body).then((result) => {
+              res.send(result);
+            })
+          })
+      } else {
+        res.send(result);
+      }
+    })
+    // .insert(req.body)
+    // .then((result) => {
+    //   res.send(result);
+    // });
 });
 
 app.put(`/${path}`, (req, res) => {
