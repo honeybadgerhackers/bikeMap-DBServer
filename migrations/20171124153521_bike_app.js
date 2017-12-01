@@ -7,6 +7,7 @@ exports.up = function(knex, Promise) {
       t.string('last_name');
       t.string('picture');
       t.string('email').unique();
+      t.string('social_media_id');
       t.timestamp("created_at").notNullable().defaultTo(knex.fn.now());
       t.timestamp("updated_at").notNullable().defaultTo(knex.fn.now());
     }),
