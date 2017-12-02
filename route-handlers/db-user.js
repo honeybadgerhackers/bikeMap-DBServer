@@ -1,5 +1,6 @@
 const express = require('express');
 const knex = require('../db.js');
+
 const path = 'user_account';
 
 const app = express();
@@ -48,28 +49,10 @@ app.post(`/${path}`, (req, res) => {
       social_media_token,
     }
   ).then((result) => {
-    console.log(result);
+    res.send(result.rows);
   }).catch((err) => {
-    console.error(err);
+    res.status(409).send(err.detail);
   });
-
-
-  // knex(path)
-  //   .where(req.body)
-  //   .then((result) => {
-  //     if (result.length === 0) {
-  //       knex(path)
-  //         .insert(req.body)
-  //         .then(() => {
-  //           knex(path).where(req.body).then((result) => {
-  //             res.send(result);
-  //           })
-  //         })
-  //     } else {
-  //       res.send(result);
-  //     }
-  //   });
-  res.send(200);
 });
 
 app.put(`/${path}`, (req, res) => {
