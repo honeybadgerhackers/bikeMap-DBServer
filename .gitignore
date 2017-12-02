@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Logs
 logs
 *.log
@@ -58,8 +57,3 @@ typings/
 # dotenv environment variables file
 .env
 
-=======
-.env
-node_modules
-test.json
->>>>>>> 5daf7609412c7e4fd646811a6793f3ebb7a1f3e7
