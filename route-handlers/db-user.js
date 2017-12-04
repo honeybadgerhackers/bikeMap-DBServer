@@ -18,7 +18,6 @@ app.get(`/${path}`, (req, res) => {
 });
 
 app.post(`/${path}`, (req, res) => {
-  console.log(req.body);
   const {
     first_name,
     last_name,
@@ -28,35 +27,34 @@ app.post(`/${path}`, (req, res) => {
     social_media_token,
   } = req.body;
 
-//   knex.raw(`SELECT DATA_TYPE 
-// FROM INFORMATION_SCHEMA.COLUMNS 
-// WHERE table_name = 'user_account' 
-// AND COLUMN_NAME = 'id'`).then(result => console.log(result));
-
-  // knex.raw(`ALTER TABLE user_account ADD CONSTRAINT emailunique UNIQUE (email)`).then(result => console.log(result));
-
-  knex.raw(`insert into user_account ( first_name, last_name, picture, email, social_media_id, social_media_token )
-  values ( :first_name, :last_name, :picture, :email, :social_media_id, :social_media_token )
-  on conflict ( social_media_id ) do update
-  SET social_media_token = :social_media_token
-  returning *`,
-    {
-      first_name,
-      last_name,
-      picture,
-      email,
-      social_media_id,
-      social_media_token,
-    }
-  ).then((result) => {
-    res.send(result.rows);
-  }).catch((err) => {
-    res.status(409).send(err.detail);
-  });
+  // eslint-disable-next-line
+  if (social_media_id) {
+    knex.raw(
+      `insert into user_account ( first_name, last_name, picture, email, social_media_id, social_media_token )
+      values ( :first_name, :last_name, :picture, :email, :social_media_id, :social_media_token )
+      on conflict ( social_media_id ) do update
+      SET social_media_token = :social_media_token
+      returning *`,
+      {
+        first_name,
+        last_name,
+        picture,
+        email,
+        social_media_id,
+        social_media_token,
+      },
+    ).then((result) => {
+      res.send(result.rows);
+    }).catch((err) => {
+      res.status(409).send(err.detail);
+    });
+  } else {
+    res.status(400).send('Invalid social media id!');
+  }
 });
 
 app.put(`/${path}`, (req, res) => {
-
+  res.sendStatus(400);
 });
 
 app.delete(`/${path}`, (req, res) => {
