@@ -27,7 +27,7 @@ app.post(`/${path}`, (req, res) => {
     social_media_id,
     social_media_token,
   } = req.body;
-
+  // console.log(req.body);
   // eslint-disable-next-line
   if (social_media_id) {
     knex.raw(
@@ -45,12 +45,13 @@ app.post(`/${path}`, (req, res) => {
         social_media_token,
       },
     ).then(({ rows: [user] }) => {
-
       res.send({
         id_token: jwt.createIdToken(user),
         access_token: jwt.createAccessToken(),
       });
     }).catch((err) => {
+      // eslint-disable-next-line
+      console.log(err);
       res.status(409).send(err.detail);
     });
   } else {

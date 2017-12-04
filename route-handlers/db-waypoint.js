@@ -1,5 +1,6 @@
 const express = require('express');
 const knex = require('../db.js');
+
 const path = 'waypoint';
 
 const app = express();

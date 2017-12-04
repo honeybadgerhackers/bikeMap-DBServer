@@ -1,5 +1,7 @@
 const express = require('express');
 const knex = require('../db.js');
+const jwt = require('../auth/route-protector');
+
 const path = 'maps';
 
 const app = express();
