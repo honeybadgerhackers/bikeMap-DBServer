@@ -1,5 +1,6 @@
 const express = require('express');
 const knex = require('../db.js');
+const jwtCreate = require('../auth/jwt');
 
 const path = 'user_account';
 
@@ -43,8 +44,8 @@ app.post(`/${path}`, (req, res) => {
         social_media_id,
         social_media_token,
       },
-    ).then((result) => {
-      res.send(result.rows);
+    ).then(({ rows: [user] }) => {
+      res.send(user);
     }).catch((err) => {
       res.status(409).send(err.detail);
     });
