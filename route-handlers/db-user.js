@@ -48,6 +48,7 @@ app.post(`/${path}`, (req, res) => {
       res.send({
         id_token: jwt.createIdToken(user),
         access_token: jwt.createAccessToken(),
+        type: 'success!',
       });
     }).catch((err) => {
       // eslint-disable-next-line
