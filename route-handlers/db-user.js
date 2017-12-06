@@ -16,7 +16,7 @@ app.get(`/${path}`, (req, res) => {
     .then((results) => {
       res.send(results);
     })
-    .catch(err => res.status(400).send('Something went wrong!', err.detail));
+    .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
 });
 
 app.post(`/${path}`, (req, res) => {
@@ -54,7 +54,7 @@ app.post(`/${path}`, (req, res) => {
     }).catch((err) => {
       // eslint-disable-next-line
       console.log(err);
-      res.status(409).send(err.detail);
+      res.status(409).send(err);
     });
   } else {
     res.status(400).send('Invalid social media id!');
@@ -71,7 +71,7 @@ app.delete(`/${path}`, (req, res) => {
       .where(req.body)
       .del()
       .then(res.send('Deleted'))
-      .catch(err => res.status(400).send('Something went wrong!', err.detail));
+      .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
   }
   res.send('Please specify row');
 });
