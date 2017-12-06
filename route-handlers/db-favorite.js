@@ -14,7 +14,8 @@ app.get(`/${path}`, (req, res) => {
     .select()
     .then((results) => {
       res.send(results);
-    });
+    })
+    .catch(err => res.status(400).send('Something went wrong!', err.detail));
 });
 
 app.post(`/${path}`, (req, res) => {
@@ -22,7 +23,8 @@ app.post(`/${path}`, (req, res) => {
     .insert(req.body)
     .then(() => {
       res.send('Success!');
-    });
+    })
+    .catch(err => res.status(400).send('Something went wrong!', err.detail));
 });
 
 app.put(`/${path}`, (req, res) => {
@@ -34,7 +36,8 @@ app.delete(`/${path}`, (req, res) => {
     knex(path)
       .where(req.body)
       .del()
-      .then(res.send('Deleted'));
+      .then(res.send('Deleted'))
+      .catch(err => res.status(400).send('Something went wrong!', err.detail));
   }
   res.send('Please specify row');
 });

@@ -15,7 +15,8 @@ app.get(`/${path}`, (req, res) => {
     .select()
     .then((results) => {
       res.send(results);
-    });
+    })
+    .catch(err => res.status(400).send('Something went wrong!', err.detail));
 });
 
 app.post(`/${path}`, (req, res) => {
@@ -27,7 +28,7 @@ app.post(`/${path}`, (req, res) => {
     social_media_id,
     social_media_token,
   } = req.body;
-  // console.log(req.body);
+
   // eslint-disable-next-line
   if (social_media_id) {
     knex.raw(
@@ -69,7 +70,8 @@ app.delete(`/${path}`, (req, res) => {
     knex(path)
       .where(req.body)
       .del()
-      .then(res.send('Deleted'));
+      .then(res.send('Deleted'))
+      .catch(err => res.status(400).send('Something went wrong!', err.detail));
   }
   res.send('Please specify row');
 });
