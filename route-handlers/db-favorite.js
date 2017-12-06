@@ -1,5 +1,6 @@
 const express = require('express');
 const knex = require('../db.js');
+
 const path = 'favorite';
 
 const app = express();
@@ -25,7 +26,7 @@ app.post(`/${path}`, (req, res) => {
 });
 
 app.put(`/${path}`, (req, res) => {
-
+  res.sendStatus(400);
 });
 
 app.delete(`/${path}`, (req, res) => {
