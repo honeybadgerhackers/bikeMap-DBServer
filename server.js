@@ -7,7 +7,6 @@ const jwt = require('./auth/route-protector');
 const app = express();
 
 app.use(jwt.check, jwt.requireScope('full_access'));
-app.use(express.json());
 
 Object.values(paths).forEach((path) => {
   app.use(path);

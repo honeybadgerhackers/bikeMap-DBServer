@@ -28,7 +28,6 @@ app.post(`/${path}`, (req, res) => {
     social_media_id,
     social_media_token,
   } = req.body;
-
   // eslint-disable-next-line
   if (social_media_id) {
     knex.raw(
