@@ -7,6 +7,34 @@ const app = express();
 
 app.use(express.json());
 
+/* eslint-disable no-param-reassign */
+app.get(`/${path}&location`, (req, res) => {
+  const filter = req.headers.filter ? JSON.parse(req.headers.filter) : {};
+  knex(path)
+    .where(filter)
+    .join('waypoint', 'route.id', '=', 'waypoint.id_route')
+    .select(
+      'route.id', 'route.route_name', 'route.type', 'route.current_rating',
+      'route.favorite_count', 'waypoint.lat', 'waypoint.lng', 'waypoint.count',
+    )
+    .then((results) => {
+      const waypoints = results.map(result => ({
+        lat: result.lat,
+        lng: result.lng,
+        count: result.count,
+      }));
+      delete results[0].lat;
+      delete results[0].lng;
+      results[0].waypoints = waypoints;
+      const mergedRoute = results[0];
+      res.send(mergedRoute);
+    })
+    .catch((error) => {
+      // eslint-disable-next-line
+      console.log(error);
+    });
+});
+
 app.get(`/${path}`, (req, res) => {
   const filter = req.headers.filter ? JSON.parse(req.headers.filter) : {};
   knex(path)
