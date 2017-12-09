@@ -20,7 +20,7 @@ exports.createAccessToken = () => (
   jwt.sign({
     iss: ISSUER,
     aud: AUDIENCE,
-    exp: Math.floor(Date.now() / 1000) + (60 * 60),
+    exp: Math.floor(Date.now() / 1000) + ((60 * 60) * 6),
     jti: genJti(),
     scope: 'full_access',
     alg: 'HS256',

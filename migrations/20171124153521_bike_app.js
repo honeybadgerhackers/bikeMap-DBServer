@@ -27,8 +27,8 @@ exports.up = function(knex, Promise) {
       t.integer('id_route')
         .references('id')
         .inTable('route');
-      t.decimal('lat');
-      t.decimal('lng');
+      t.decimal('lat', 8, 6);
+      t.decimal('lng', 9, 6);
       t.string('street');
       t.integer('count');
       t.string('address');
