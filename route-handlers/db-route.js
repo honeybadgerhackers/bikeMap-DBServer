@@ -86,7 +86,6 @@ app.post(`/${path}`, async ({ body }, res) => {
       .insert(route)
       .returning('id')
       .then(([id]) => {
-        console.log(id);
         const mappedWaypoints = waypoints.map(({ lat, lng, street = null }, count) => (
           {
             id_route: id,
@@ -96,26 +95,17 @@ app.post(`/${path}`, async ({ body }, res) => {
             street,
           }
         ));
-        console.log(mappedWaypoints);
         knex('waypoint')
           .insert(mappedWaypoints)
-          .returning('*')
+          // .returning('*')
           .then((result) => {
-            res.send({ type: 'Success!', result });
+            res.send({ type: 'Success!', result, routeId: id });
           })
           .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
       });
   } else {
     res.sendStatus(403);
   }
-  
-  // knex(path)
-  //   .insert(req.body)
-  //   .then(() => {
-  //     res.send('Success!');
-  //   })
-  //   .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
-  // res.send('hi');
 });
 
 app.put(`/${path}`, (req, res) => {
