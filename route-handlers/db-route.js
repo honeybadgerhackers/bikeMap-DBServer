@@ -75,7 +75,7 @@ app.post(`/${path}`, async ({ body }, res) => {
     waypoints[waypoints.length - 1].street = lastStreet.short_name;
 
     const route = {
-      name: `${firstStreet.short_name} to ${lastStreet.short_name}`,
+      route_name: `${firstStreet.short_name} to ${lastStreet.short_name}`,
       id_user_account: userId,
       type: null,
       favorite_count: 0,
@@ -85,8 +85,9 @@ app.post(`/${path}`, async ({ body }, res) => {
     knex(path)
       .insert(route)
       .returning('id')
-      .then((id) => {
-        const mappedWaypoints = waypoints.map(({ lat, lng, street }, count) => (
+      .then(([id]) => {
+        console.log(id);
+        const mappedWaypoints = waypoints.map(({ lat, lng, street = null }, count) => (
           {
             id_route: id,
             lat,
@@ -95,6 +96,7 @@ app.post(`/${path}`, async ({ body }, res) => {
             street,
           }
         ));
+        console.log(mappedWaypoints);
         knex('waypoint')
           .insert(mappedWaypoints)
           .returning('*')
