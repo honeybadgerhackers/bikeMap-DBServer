@@ -1,5 +1,6 @@
 const express = require('express');
 const knex = require('../db.js');
+const googleCalls = require('../utilities/google');
 
 const path = 'route';
 
@@ -46,13 +47,73 @@ app.get(`/${path}`, (req, res) => {
     .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
 });
 
-app.post(`/${path}`, (req, res) => {
-  knex(path)
-    .insert(req.body)
-    .then(() => {
-      res.send('Success!');
-    })
-    .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
+app.post(`/${path}`, async ({ body }, res) => {
+  if (body.waypoints) {
+    const { waypoints, userId } = body;
+    const first = waypoints[0];
+    const last = waypoints[waypoints.length - 1];
+
+    const { data: { results: [firstAddress] } } = await googleCalls.reverseGeocode(`${first.lat},${first.lng}`);
+
+    const [firstStreet] = firstAddress.address_components.filter((component) => {
+      if (component.types.indexOf('route') > -1) {
+        return true;
+      }
+      return false;
+    });
+
+    const { data: { results: [lastAddress] } } = await googleCalls.reverseGeocode(`${last.lat},${last.lng}`);
+
+    const [lastStreet] = lastAddress.address_components.filter((component) => {
+      if (component.types.indexOf('route') > -1) {
+        return true;
+      }
+      return false;
+    });
+
+    waypoints[0].street = firstStreet.short_name;
+    waypoints[waypoints.length - 1].street = lastStreet.short_name;
+
+    const route = {
+      name: `${firstStreet.short_name} to ${lastStreet.short_name}`,
+      id_user_account: userId,
+      type: null,
+      favorite_count: 0,
+      current_rating: 0,
+    };
+
+    knex(path)
+      .insert(route)
+      .returning('id')
+      .then((id) => {
+        const mappedWaypoints = waypoints.map(({ lat, lng, street }, count) => (
+          {
+            id_route: id,
+            lat,
+            lng,
+            count,
+            street,
+          }
+        ));
+        knex('waypoint')
+          .insert(mappedWaypoints)
+          .returning('*')
+          .then((result) => {
+            res.send({ type: 'Success!', result });
+          })
+          .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
+      });
+  } else {
+    res.sendStatus(403);
+  }
+  
+  // knex(path)
+  //   .insert(req.body)
+  //   .then(() => {
+  //     res.send('Success!');
+  //   })
+  //   .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
+  // res.send('hi');
 });
 
 app.put(`/${path}`, (req, res) => {
