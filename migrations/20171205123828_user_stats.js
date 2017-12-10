@@ -7,10 +7,10 @@ exports.up = (knex, Promise) => {
       t.string('polyline_backward');
     }),
     knex.schema.table('user_account', (t) => {
-      t.number('calories');
-      t.number('avg_speed');
-      t.number('avg_speed_counter');
-      t.number('total_distance');
+      t.integer('calories');
+      t.integer('avg_speed');
+      t.integer('avg_speed_counter');
+      t.integer('total_distance');
     }),
   ]);
 };
