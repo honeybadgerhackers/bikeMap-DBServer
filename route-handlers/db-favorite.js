@@ -12,6 +12,7 @@ app.get(`/${path}`, (req, res) => {
   knex(path)
     .where(filter)
     .select()
+    .join('route', 'route.id', '=', 'favorite.id_route')
     .then((results) => {
       res.send(results);
     })
