@@ -47,6 +47,28 @@ app.get(`/${path}`, (req, res) => {
     .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
 });
 
+app.get(`/${path}nearby`, (req, res) => {
+  const filter = req.headers.filter ? JSON.parse(req.headers.filter) : {};
+  knex('waypoint')
+    .select()
+    .where(function() {
+      this.where({count: 0})
+      .whereBetween('lat', [filter.lat - .09, filter.lat + .09])
+      .andWhereBetween('lng', [filter.lng - .09, filter.lat + .09])
+    })
+    .orWhere(function() {
+        this.whereNot({count: 0})
+        .andWhereNot({street: null})
+        .whereBetween('lat', [filter.lat - .09, filter.lat + .09])
+        .andWhereBetween('lng', [filter.lng - .09, filter.lat + .09])
+    })
+    .join('route', 'route.id', '=', 'waypoint.id_route')
+    .then((results) => {
+      res.send(results);
+    })
+    .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
+});
+
 app.post(`/${path}`, async ({ body }, res) => {
   if (body.waypoints) {
     const { waypoints, userId } = body;
