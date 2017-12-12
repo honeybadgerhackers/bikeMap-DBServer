@@ -48,21 +48,23 @@ app.get(`/${path}`, (req, res) => {
 });
 
 app.get(`/${path}nearby`, (req, res) => {
-  const filter = req.headers.filter ? JSON.parse(req.headers.filter) : {lat: 29.9459695, lng: -90.07005989999999};
+  const filter = req.headers.filter ?
+    JSON.parse(req.headers.filter) :
+    { lat: 29.9459695, lng: -90.07005989999999 };
   if (!filter.distance) {
-    filter.distance = 0.07
-  };
-  const {lat, lng, distance} = filter;
+    filter.distance = 0.07;
+  }
+  const { lat, lng, distance } = filter;
   knex('waypoint')
     .select()
-    .where(function() {
-      this.where({count: 0})
-      .whereBetween('lat', [lat - distance, lat + distance])
-      .andWhereBetween('lng', [lng - distance, lng + distance])
+    .where(() => {
+      this.where({ count: 0 })
+        .whereBetween('lat', [lat - distance, lat + distance])
+        .andWhereBetween('lng', [lng - distance, lng + distance])
     })
-    .orWhere(function() {
-        this.whereNot({count: 0})
-        .andWhereNot({street: null})
+    .orWhere(() => {
+      this.whereNot({ count: 0 })
+        .andWhereNot({ street: null })
         .whereBetween('lat', [lat - distance, lat + distance])
         .andWhereBetween('lng', [lng - distance, lng + distance])
     })
@@ -74,7 +76,6 @@ app.get(`/${path}nearby`, (req, res) => {
 });
 
 app.post(`/${path}`, async ({ body }, res) => {
-  console.log(body);
   if (body.tripData.wayPoints) {
     const {
       tripData: {
@@ -126,7 +127,10 @@ app.post(`/${path}`, async ({ body }, res) => {
       .insert(route)
       .returning('id')
       .then(([id]) => {
-        const mappedWaypoints = wayPoints.map(({ location: { lat, lng }, street = null }, count) => (
+        const mappedWaypoints = wayPoints.map(({
+          location: { lat, lng },
+          street = null,
+        }, count) => (
           {
             id_route: id,
             lat,
