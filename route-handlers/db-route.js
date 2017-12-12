@@ -48,21 +48,23 @@ app.get(`/${path}`, (req, res) => {
 });
 
 app.get(`/${path}nearby`, (req, res) => {
-  const filter = req.headers.filter ? JSON.parse(req.headers.filter) : {lat: 29.9459695, lng: -90.07005989999999};
+  const filter = req.headers.filter ?
+    JSON.parse(req.headers.filter) :
+    { lat: 29.9459695, lng: -90.07005989999999 };
   if (!filter.distance) {
-    filter.distance = 0.07
-  };
-  const {lat, lng, distance} = filter;
+    filter.distance = 0.07;
+  }
+  const { lat, lng, distance } = filter;
   knex('waypoint')
     .select()
-    .where(function() {
-      this.where({count: 0})
-      .whereBetween('lat', [lat - distance, lat + distance])
-      .andWhereBetween('lng', [lng - distance, lng + distance])
+    .where(() => {
+      this.where({ count: 0 })
+        .whereBetween('lat', [lat - distance, lat + distance])
+        .andWhereBetween('lng', [lng - distance, lng + distance])
     })
-    .orWhere(function() {
-        this.whereNot({count: 0})
-        .andWhereNot({street: null})
+    .orWhere(() => {
+      this.whereNot({ count: 0 })
+        .andWhereNot({ street: null })
         .whereBetween('lat', [lat - distance, lat + distance])
         .andWhereBetween('lng', [lng - distance, lng + distance])
     })
@@ -74,10 +76,23 @@ app.get(`/${path}nearby`, (req, res) => {
 });
 
 app.post(`/${path}`, async ({ body }, res) => {
-  if (body.waypoints) {
-    const { waypoints, userId } = body;
-    const first = waypoints[0];
-    const last = waypoints[waypoints.length - 1];
+  if (body.tripData.wayPoints) {
+    const {
+      tripData: {
+        userId,
+        routeTitle,
+        wayPoints,
+        distance,
+      },
+      tripStats: {
+        avgSpeed,
+        rating,
+        speedCounter,
+      },
+    } = body;
+
+    const first = wayPoints[0].location;
+    const last = wayPoints[wayPoints.length - 1].location;
 
     const { data: { results: [firstAddress] } } = await googleCalls.reverseGeocode(`${first.lat},${first.lng}`);
 
@@ -97,22 +112,25 @@ app.post(`/${path}`, async ({ body }, res) => {
       return false;
     });
 
-    waypoints[0].street = firstStreet.short_name;
-    waypoints[waypoints.length - 1].street = lastStreet.short_name;
+    wayPoints[0].street = firstStreet.short_name;
+    wayPoints[wayPoints.length - 1].street = lastStreet.short_name;
 
     const route = {
-      route_name: `${firstStreet.short_name} to ${lastStreet.short_name}`,
+      route_name: routeTitle,
       id_user_account: userId,
       type: null,
       favorite_count: 0,
-      current_rating: 0,
+      current_rating: rating,
     };
 
     knex(path)
       .insert(route)
       .returning('id')
       .then(([id]) => {
-        const mappedWaypoints = waypoints.map(({ lat, lng, street = null }, count) => (
+        const mappedWaypoints = wayPoints.map(({
+          location: { lat, lng },
+          street = null,
+        }, count) => (
           {
             id_route: id,
             lat,
