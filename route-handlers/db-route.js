@@ -47,6 +47,32 @@ app.get(`/${path}`, (req, res) => {
     .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
 });
 
+app.get(`/${path}nearby`, (req, res) => {
+  const filter = req.headers.filter ? JSON.parse(req.headers.filter) : {lat: 29.9459695, lng: -90.07005989999999};
+  if (!filter.distance) {
+    filter.distance = 0.07
+  };
+  const {lat, lng, distance} = filter;
+  knex('waypoint')
+    .select()
+    .where(function() {
+      this.where({count: 0})
+      .whereBetween('lat', [lat - distance, lat + distance])
+      .andWhereBetween('lng', [lng - distance, lng + distance])
+    })
+    .orWhere(function() {
+        this.whereNot({count: 0})
+        .andWhereNot({street: null})
+        .whereBetween('lat', [lat - distance, lat + distance])
+        .andWhereBetween('lng', [lng - distance, lng + distance])
+    })
+    .join('route', 'route.id', '=', 'waypoint.id_route')
+    .then((results) => {
+      res.send(results);
+    })
+    .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
+});
+
 app.post(`/${path}`, async ({ body }, res) => {
   console.log(body);
   if (body.tripData.wayPoints) {
