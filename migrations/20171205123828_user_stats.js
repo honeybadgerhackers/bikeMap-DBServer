@@ -3,9 +3,9 @@ exports.up = (knex, Promise) => {
   return Promise.all([
     knex.schema.table('route', (t) => {
       t.string('photo_url');
-      t.string('route_preview');  
+      t.string('route_preview');
     }),
-    knex.schema.table('route', (t) => {
+    knex.schema.table('session', (t) => {
       t.string('photo_url');
     }),
     knex.schema.table('user_account', (t) => {
@@ -23,7 +23,7 @@ exports.down = (knex, Promise) => {
       t.dropColumn('photo_url');
       t.dropColumn('route_preview');
     }),
-    knex.schema.table('route', (t) => {
+    knex.schema.table('session', (t) => {
       t.dropColumn('photo_url');
     }),
     knex.schema.table('user_account', (t) => {

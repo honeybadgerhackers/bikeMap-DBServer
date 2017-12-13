@@ -1,5 +1,6 @@
 const express = require('express');
 const knex = require('../db.js');
+const googleCalls = require('../utilities/google');
 
 const path = 'session';
 
@@ -18,37 +19,53 @@ app.get(`/${path}`, (req, res) => {
     .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
 });
 
-app.post(`/${path}`, ({ body }, res) => {
+app.post(`/${path}`, async ({ body }, res) => {
+
   if (body.tripData) {
     const {
       tripData: {
+        id: id_route,
         userId,
-        routeId,
-        distance,
-        time,
       },
       tripStats: {
+        speedCounter,
         avgSpeed,
         rating,
-        speedCounter,
+        time,
+        origin,
+        destination,
+        wayPoints,
       },
     } = body;
 
+    const tripInfo = await googleCalls.getRouteDistance(origin, destination, wayPoints);
+
+    const {
+      data: {
+        routes: [{
+          legs: [{
+            distance: { text },
+
+          }],
+        }],
+      },
+    } = tripInfo;
+    const distance = Number(text.split(' ')[0]);
+
     const session = {
-      id_route: routeId,
       id_user_account: userId,
       mph: avgSpeed,
+      id_route,
       distance,
       time,
     };
-    console.log(session)
 
-  //   knex(path)
-  //     .insert(session)
-  //     .returning('id')
-  //     .then(([id]) => {
-  //       res.send(id);
-  //     });
+    knex(path)
+      .insert(session)
+      .returning('id')
+      .then(([id]) => {
+        res.send({ sessionId: id });
+      });
   } else {
     res.sendStatus(403);
   }
