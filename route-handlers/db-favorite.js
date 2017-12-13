@@ -28,17 +28,26 @@ app.post(`/${path}`, (req, res) => {
   })
   .first()
   .then((found) => {
-     if (found) {
-       res.send('Already present');
-     } else {
+     if (!found) {
         knex(path)
           .insert(req.body)
           .then(() => {
-            res.send('New entry added')
+            knex(path)
+            .where({"favorite.id_user_account": id_user_account})
+            .join('route', 'route.id', '=', 'favorite.id_route')
+            .then((results) => {
+              res.send(results);
+            })
           })
+      } else {
+        knex(path)
+        .where({"favorite.id_user_account": id_user_account})
+        .join('route', 'route.id', '=', 'favorite.id_route')
+        .then((results) => {
+          res.send(results);
+        })
       }
-  })
-    .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
+  }).catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
 });
 
 app.put(`/${path}`, (req, res) => {
@@ -46,15 +55,27 @@ app.put(`/${path}`, (req, res) => {
 });
 
 app.delete(`/${path}`, (req, res) => {
+  const {id_user_account, id_route} = req.body
   if (Object.keys(req.body).length) {
     knex(path)
       .where(req.body)
       .del()
-      .then(res.send('Deleted'))
-      .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
-  } else {
-    res.send('Please specify row');
-  }
-});
+      .then(() => {
+        knex(path)
+        .where({"favorite.id_user_account": id_user_account})
+        .join('route', 'route.id', '=', 'favorite.id_route')
+        .then((results) => {
+          res.send(results);
+        })
+      }).catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
+    } else {
+      knex(path)
+      .where({"favorite.id_user_account": id_user_account})
+      .join('route', 'route.id', '=', 'favorite.id_route')
+      .then((results) => {
+        res.send(results);
+      }).catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
+    }
+  })
 
 module.exports = app;
