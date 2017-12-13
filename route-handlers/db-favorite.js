@@ -20,11 +20,24 @@ app.get(`/${path}`, (req, res) => {
 });
 
 app.post(`/${path}`, (req, res) => {
+  const {id_user_account, id_route} = req.body
   knex(path)
-    .insert(req.body)
-    .then(() => {
-      res.send('Success!');
-    })
+  .where({
+    id_user_account,
+    id_route
+  })
+  .first()
+  .then((found) => {
+     if (found) {
+       res.send('Already present');
+     } else {
+        knex(path)
+          .insert(req.body)
+          .then(() => {
+            res.send('New entry added')
+          })
+      }
+  })
     .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
 });
 
