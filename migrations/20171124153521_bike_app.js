@@ -42,7 +42,7 @@ exports.up = function(knex, Promise) {
         .references('id')
         .inTable('route');
       t.decimal('mph');
-      t.integer('time');
+      t.decimal('time');
       t.decimal('distance');
       t.integer('calories');
     }),

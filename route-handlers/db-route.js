@@ -47,7 +47,11 @@ app.get(`/${path}`, (req, res) => {
     .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
 });
 
-app.get(`/${path}nearby`, (req, res) => {
+/*
+`SELECT *, ( 3959 * acos( cos( radians(${lat}) ) * cos( radians( lng ) ) * cos( radians( lat ) - radians(${lng}) ) + sin( radians(${lat}) ) * sin( radians( lng ) ) ) ) AS distance FROM petpost HAVING (distance < ${dist}) AND count LIKE '%${searchAnimalType}%' AND (styles LIKE ${tagList}) ORDER BY id;`
+*/
+
+app.get(`/${path}&nearby`, (req, res) => {
   const filter = req.headers.filter ?
     JSON.parse(req.headers.filter) :
     { lat: 29.9459695, lng: -90.07005989999999 };
@@ -57,12 +61,12 @@ app.get(`/${path}nearby`, (req, res) => {
   const { lat, lng, distance } = filter;
   knex('waypoint')
     .select()
-    .where(function() {
+    .where(function inner() {
       this.where({ count: 0 })
         .whereBetween('lat', [lat - distance, lat + distance])
         .andWhereBetween('lng', [lng - distance, lng + distance])
     })
-    .orWhere(function() {
+    .orWhere(function inner() {
       this.whereNot({ count: 0 })
         .andWhereNot({ street: null })
         .whereBetween('lat', [lat - distance, lat + distance])
