@@ -102,8 +102,8 @@ app.post(`/${path}`, async ({ body }, res) => {
         speedCounter,
         imageBase64,
       },
-
     } = body;
+
     let routeImage = '';
     const first = wayPoints[0].location;
     const last = wayPoints[wayPoints.length - 1].location;
@@ -130,7 +130,7 @@ app.post(`/${path}`, async ({ body }, res) => {
     wayPoints[wayPoints.length - 1].street = lastStreet.short_name;
     
     await cloudinary.uploader.upload(`data:image/jpeg;base64,${imageBase64}`, function(result) {
-      routeImage = result.secure_url, 'BASE64'
+      routeImage = result.secure_url;
     })
 
     const route = {

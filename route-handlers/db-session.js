@@ -1,6 +1,13 @@
 const express = require('express');
 const knex = require('../db.js');
 const googleCalls = require('../utilities/google');
+var cloudinary = require("cloudinary");
+
+cloudinary.config({
+  cloud_name: "honeybadgerhackers",
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 const path = 'session';
 
@@ -35,9 +42,11 @@ app.post(`/${path}`, async ({ body }, res) => {
         origin,
         destination,
         wayPoints,
+        imageBase64
       },
     } = body;
 
+    let routeImage = "";
     const tripInfo = await googleCalls.getRouteDistance(origin, destination, wayPoints);
 
     const {
@@ -52,12 +61,17 @@ app.post(`/${path}`, async ({ body }, res) => {
     } = tripInfo;
     const distance = Number(text.split(' ')[0]);
 
+    await cloudinary.uploader.upload(`data:image/jpeg;base64,${imageBase64}`, function(result) {
+      routeImage = result.secure_url;
+    })
+
     const session = {
       id_user_account: userId,
       mph: avgSpeed,
       id_route,
       distance,
       time,
+      photo_url: routeImage,
     };
 
     knex(path)
