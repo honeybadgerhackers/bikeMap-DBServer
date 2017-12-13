@@ -3,7 +3,7 @@ exports.up = (knex, Promise) => {
   return Promise.all([
     knex.schema.table('route', (t) => {
       t.string('photo_url');
-      t.string('route_preview');
+      t.string('route_preview');  
     }),
     knex.schema.table('route', (t) => {
       t.string('photo_url');

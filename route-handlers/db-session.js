@@ -18,13 +18,39 @@ app.get(`/${path}`, (req, res) => {
     .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
 });
 
-app.post(`/${path}`, (req, res) => {
-  knex(path)
-    .insert(req.body)
-    .then(() => {
-      res.send('Success!');
-    })
-    .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
+app.post(`/${path}`, ({ body }, res) => {
+  if (body.tripData) {
+    const {
+      tripData: {
+        userId,
+        routeId,
+        distance,
+        time,
+      },
+      tripStats: {
+        avgSpeed,
+        rating,
+        speedCounter,
+      },
+    } = body;
+
+    const session = {
+      id_route: routeId,
+      id_user_account: userId,
+      mph: avgSpeed,
+      distance,
+      time,
+    };
+
+    knex(path)
+      .insert(session)
+      .returning('id')
+      .then(([id]) => {
+        res.send(id);
+      });
+  } else {
+    res.sendStatus(403);
+  }
 });
 
 app.put(`/${path}`, (req, res) => {
