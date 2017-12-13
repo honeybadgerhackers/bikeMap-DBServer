@@ -55,29 +55,11 @@ app.get(`/${path}`, (req, res) => {
     }); 
 });
 
-app.get(`/${path}&location`, (req, res) => {
-  const filter = req.headers.filter ? JSON.parse(req.headers.filter) : {};
-  knex(path)
-    .where(filter)
-    .join('waypoint', 'route.id', '=', 'waypoint.id_route')
-    .select('route.id', 'route.route_name', 'route.type', 'route.current_rating', 
-            'route.favorite_count', 'waypoint.lat', 'waypoint.lng', 'waypoint.count')
-    .then((results) => {
-      let waypoints = results.map(result => {
-        return {lat: result.lat, lng: result.lng, count: result.count}
-      });
-      delete results[0].lat;
-      delete results[0].lng;
-      results[0].waypoints = waypoints;
-      let mergedRoute = results[0];
-      res.send(mergedRoute);
-    }).catch((error) => {
-      console.log(error);
-    })      
-}); 
+/*
+`SELECT *, ( 3959 * acos( cos( radians(${lat}) ) * cos( radians( lng ) ) * cos( radians( lat ) - radians(${lng}) ) + sin( radians(${lat}) ) * sin( radians( lng ) ) ) ) AS distance FROM petpost HAVING (distance < ${dist}) AND count LIKE '%${searchAnimalType}%' AND (styles LIKE ${tagList}) ORDER BY id;`
+*/
 
-
-app.get(`/${path}nearby`, (req, res) => {
+app.get(`/${path}&nearby`, (req, res) => {
   const filter = req.headers.filter ?
     JSON.parse(req.headers.filter) :
     { lat: 29.9459695, lng: -90.07005989999999 };
@@ -87,12 +69,12 @@ app.get(`/${path}nearby`, (req, res) => {
   const { lat, lng, distance } = filter;
   knex('waypoint')
     .select()
-    .where(function() {
+    .where(function inner() {
       this.where({ count: 0 })
         .whereBetween('lat', [lat - distance, lat + distance])
         .andWhereBetween('lng', [lng - distance, lng + distance])
     })
-    .orWhere(function() {
+    .orWhere(function inner() {
       this.whereNot({ count: 0 })
         .andWhereNot({ street: null })
         .whereBetween('lat', [lat - distance, lat + distance])
