@@ -76,7 +76,7 @@ app.put(`/${path}`, (req, res) => {
 });
 
 app.delete(`/${path}`, (req, res) => {
-  if (Object.keys(req.body).length) {
+  if (Object.keys(req.body).length) { 
     knex(path)
       .where(req.body)
       .del()

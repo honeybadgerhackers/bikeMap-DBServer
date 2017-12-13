@@ -61,20 +61,12 @@ app.get(`/${path}&nearby`, (req, res) => {
   const { lat, lng, distance } = filter;
   knex('waypoint')
     .select()
-<<<<<<< HEAD
     .where(function inner() {
-=======
-    .where(function() {
->>>>>>> db9f6836892b74f745119164dcfa9b644cf48c16
       this.where({ count: 0 })
         .whereBetween('lat', [lat - distance, lat + distance])
         .andWhereBetween('lng', [lng - distance, lng + distance])
     })
-<<<<<<< HEAD
     .orWhere(function inner() {
-=======
-    .orWhere(function() {
->>>>>>> db9f6836892b74f745119164dcfa9b644cf48c16
       this.whereNot({ count: 0 })
         .andWhereNot({ street: null })
         .whereBetween('lat', [lat - distance, lat + distance])
