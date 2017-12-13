@@ -52,8 +52,9 @@ app.delete(`/${path}`, (req, res) => {
       .del()
       .then(res.send('Deleted'))
       .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
+  } else {
+    res.send('Please specify row');
   }
-  res.send('Please specify row');
 });
 
 module.exports = app;
