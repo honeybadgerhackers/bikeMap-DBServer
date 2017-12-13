@@ -147,7 +147,7 @@ app.post(`/${path}`, async ({ body }, res) => {
     wayPoints[0].street = firstStreet.short_name;
     wayPoints[wayPoints.length - 1].street = lastStreet.short_name;
     
-    cloudinary.uploader.upload(`data:image/jpeg;base64,${imageBase64}`, function(result) {
+    await cloudinary.uploader.upload(`data:image/jpeg;base64,${imageBase64}`, function(result) {
       routeImage = result.secure_url, 'BASE64'
     })
 
