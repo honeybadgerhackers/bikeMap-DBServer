@@ -41,13 +41,14 @@ app.post(`/${path}`, ({ body }, res) => {
       distance,
       time,
     };
+    console.log(session)
 
-    knex(path)
-      .insert(session)
-      .returning('id')
-      .then(([id]) => {
-        res.send(id);
-      });
+  //   knex(path)
+  //     .insert(session)
+  //     .returning('id')
+  //     .then(([id]) => {
+  //       res.send(id);
+  //     });
   } else {
     res.sendStatus(403);
   }
