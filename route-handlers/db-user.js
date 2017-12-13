@@ -15,7 +15,8 @@ app.get(`/${path}`, (req, res) => {
     .select()
     .then((results) => {
       res.send(results);
-    });
+    })
+    .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
 });
 
 app.post(`/${path}`, (req, res) => {
@@ -27,7 +28,6 @@ app.post(`/${path}`, (req, res) => {
     social_media_id,
     social_media_token,
   } = req.body;
-  // console.log(req.body);
   // eslint-disable-next-line
   if (social_media_id) {
     knex.raw(
@@ -52,7 +52,7 @@ app.post(`/${path}`, (req, res) => {
     }).catch((err) => {
       // eslint-disable-next-line
       console.log(err);
-      res.status(409).send(err.detail);
+      res.status(409).send(err);
     });
   } else {
     res.status(400).send('Invalid social media id!');
@@ -68,7 +68,8 @@ app.delete(`/${path}`, (req, res) => {
     knex(path)
       .where(req.body)
       .del()
-      .then(res.send('Deleted'));
+      .then(res.send('Deleted'))
+      .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
   }
   res.send('Please specify row');
 });

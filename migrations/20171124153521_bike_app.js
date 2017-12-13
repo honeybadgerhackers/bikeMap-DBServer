@@ -6,8 +6,7 @@ exports.up = function(knex, Promise) {
       t.string('first_name');
       t.string('last_name');
       t.string('picture');
-      t.string('email').unique();
-      t.string('social_media_id');
+      t.string('email');
       t.timestamp("created_at").notNullable().defaultTo(knex.fn.now());
       t.timestamp("updated_at").notNullable().defaultTo(knex.fn.now());
     }),
@@ -28,8 +27,8 @@ exports.up = function(knex, Promise) {
       t.integer('id_route')
         .references('id')
         .inTable('route');
-      t.decimal('lat');
-      t.decimal('lng');
+      t.decimal('lat', 8, 6);
+      t.decimal('lng', 9, 6);
       t.string('street');
       t.integer('count');
       t.string('address');
