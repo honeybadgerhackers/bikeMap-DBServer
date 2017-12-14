@@ -19,6 +19,15 @@ app.get(`/${path}`, (req, res) => {
     .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
 });
 
+const updateRoute = (id_user_account, id_route, increment) => {
+  knex('route')
+    .where({id: id_route})
+    .update({
+      favorite_count: knex.raw(`favorite_count ${increment ? '+' : '-'} 1`)
+    })
+    .then()
+};
+
 app.post(`/${path}`, (req, res) => {
   const {id_user_account, id_route} = req.body
   knex(path)
@@ -36,6 +45,7 @@ app.post(`/${path}`, (req, res) => {
             .where({"favorite.id_user_account": id_user_account})
             .join('route', 'route.id', '=', 'favorite.id_route')
             .then((results) => {
+              updateRoute(id_user_account, id_route, true)
               res.send(results);
             })
           })
@@ -65,6 +75,7 @@ app.delete(`/${path}`, (req, res) => {
         .where({"favorite.id_user_account": id_user_account})
         .join('route', 'route.id', '=', 'favorite.id_route')
         .then((results) => {
+          updateRoute(id_user_account, id_route, false)
           res.send(results);
         })
       }).catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
