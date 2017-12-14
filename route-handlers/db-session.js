@@ -1,7 +1,7 @@
 const express = require('express');
 const knex = require('../db.js');
 const googleCalls = require('../utilities/google');
-var cloudinary = require("cloudinary");
+const cloudinary = require("cloudinary");
 
 cloudinary.config({
   cloud_name: "honeybadgerhackers",
@@ -61,9 +61,18 @@ app.post(`/${path}`, async ({ body }, res) => {
     } = tripInfo;
     const distance = Number(text.split(' ')[0]);
 
-    await cloudinary.uploader.upload(`data:image/jpeg;base64,${imageBase64}`, function(result) {
-      routeImage = result.secure_url;
-    })
+    if (imageBase64 !== '') {
+      await cloudinary.uploader.upload(`data:image/jpeg;base64,${imageBase64}`, (result) => {
+        if (result.error) {
+          // eslint-disable-next-line
+          console.error(JSON.stringify(result.error));
+          routeImage = null;
+        } else {
+          routeImage = result.secure_url;
+        }
+      });
+    }
+
 
     const session = {
       id_user_account: userId,
