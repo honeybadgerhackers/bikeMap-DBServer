@@ -21,6 +21,23 @@ app.get(`/${path}`, (req, res) => {
 app.post(`/${path}`, (req, res) => {
   const { id_user_account, id_route, rating } = req.body;
 
+  const updateRoute = () => {
+    knex(path)
+      .where({id_route})
+      .select()
+      .then((response) => {
+        const rating = (response.reduce((prev, current) => {
+          return prev + current.rating;
+        }, 0) / response.length);
+        knex('route')
+        .where({id: id_route})
+        .update({current_rating: rating})
+        .then(() => {
+          console.info(`updated rating ${id_route}`);
+        })
+      })
+  }
+
   knex(path)
     .where({ id_user_account, id_route })
     .update({ rating })
@@ -28,8 +45,11 @@ app.post(`/${path}`, (req, res) => {
       if (!result) {
         knex(path)
           .insert(req.body)
-          .then(res.send('submitted'));
+          .then(() => {
+            updateRoute();
+            res.send('submitted')});
       } else {
+        updateRoute();
         res.send('updated');
       }
     })
