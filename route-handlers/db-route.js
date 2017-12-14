@@ -1,12 +1,21 @@
 const express = require('express');
 const knex = require('../db.js');
 const googleCalls = require('../utilities/google');
+var cloudinary = require("cloudinary");
 
 const path = 'route';
 
 const app = express();
 
 app.use(express.json());
+
+cloudinary.config({ 
+  cloud_name: 'honeybadgerhackers', 
+  api_key: process.env.CLOUDINARY_API_KEY, 
+  api_secret: process.env.CLOUDINARY_API_SECRET, 
+});
+
+
 
 /* eslint-disable no-param-reassign */
 app.get(`/${path}&location`, (req, res) => {
@@ -43,8 +52,7 @@ app.get(`/${path}`, (req, res) => {
     .select()
     .then((results) => {
       res.send(results);
-    })
-    .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
+    }); 
 });
 
 /*
@@ -92,9 +100,11 @@ app.post(`/${path}`, async ({ body }, res) => {
         avgSpeed,
         rating,
         speedCounter,
+        imageBase64,
       },
     } = body;
 
+    let routeImage = '';
     const first = wayPoints[0].location;
     const last = wayPoints[wayPoints.length - 1].location;
 
@@ -118,6 +128,10 @@ app.post(`/${path}`, async ({ body }, res) => {
 
     wayPoints[0].street = firstStreet.short_name;
     wayPoints[wayPoints.length - 1].street = lastStreet.short_name;
+    
+    await cloudinary.uploader.upload(`data:image/jpeg;base64,${imageBase64}`, function(result) {
+      routeImage = result.secure_url;
+    })
 
     const route = {
       route_name: routeTitle,
@@ -125,32 +139,37 @@ app.post(`/${path}`, async ({ body }, res) => {
       type: null,
       favorite_count: 0,
       current_rating: rating,
+      photo_url: routeImage,
     };
 
     knex(path)
       .insert(route)
-      .returning('id')
+      .returning("id")
       .then(([id]) => {
-        const mappedWaypoints = wayPoints.map(({
-          location: { lat, lng },
-          street = null,
-        }, count) => (
-          {
+        const mappedWaypoints = wayPoints.map(
+          ({ location: { lat, lng }, street = null }, count) => ({
             id_route: id,
             lat,
             lng,
             count,
-            street,
-          }
-        ));
-        knex('waypoint')
+            street
+          })
+        );
+        knex("waypoint")
           .insert(mappedWaypoints)
           // .returning('*')
-          .then((result) => {
-            res.send({ type: 'Success!', result, routeId: id });
+          .then(result => {
+            res.send({ type: "Success!", result, routeId: id });
           })
-          .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
-      });
+          .catch(err =>
+            res
+              .status(400)
+              .send({ text: "Something went wrong!", error: err })
+          );
+      })
+      .catch(err =>
+        res.status(400).send({ text: "Something went wrong!", error: err })
+      )
   } else {
     res.sendStatus(403);
   }

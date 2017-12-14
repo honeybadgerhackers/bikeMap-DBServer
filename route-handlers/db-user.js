@@ -43,8 +43,7 @@ app.post(`/${path}`, (req, res) => {
         email,
         social_media_id,
         social_media_token,
-      },
-    ).then(({ rows: [user] }) => {
+      }).then(({ rows: [user] }) => {
       res.send({
         id_token: jwt.createIdToken(user),
         access_token: jwt.createAccessToken(),

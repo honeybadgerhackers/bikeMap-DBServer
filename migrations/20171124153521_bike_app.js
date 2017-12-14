@@ -11,7 +11,7 @@ exports.up = function(knex, Promise) {
       t.timestamp("updated_at").notNullable().defaultTo(knex.fn.now());
     }),
     knex.schema.createTable('route', (t) => {
-      t.increments('id').primary();
+      t.increments('id').primary(); 
       t.string('route_name');
       t.string('type');
       t.integer('id_user_account')

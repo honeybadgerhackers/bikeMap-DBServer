@@ -13,6 +13,7 @@
   "dependencies": {
     "axios": "^0.17.1",
     "bookshelf": "^0.11.1",
+    "cloudinary": "^1.9.1",
     "cors": "^2.8.4",
     "dotenv": "^4.0.0",
     "errorhandler": "^1.5.0",
