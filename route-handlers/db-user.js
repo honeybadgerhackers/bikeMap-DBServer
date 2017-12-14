@@ -8,6 +8,21 @@ const app = express();
 
 app.use(express.json());
 
+app.get(`/${path}&photos`, (req, res) => {
+  const filter = req.headers.filter ? JSON.parse(req.headers.filter) : {};
+  knex('route')
+    .where(filter)
+    .select('photo_url')
+    .then((routePhotos) => {
+      knex('session')
+      .where(filter)
+      .select('photo_url')
+      .then((sessionPhotos) => {
+        res.send(routePhotos.concat(sessionPhotos));
+      })
+    }).catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
+})
+
 app.get(`/${path}`, (req, res) => {
   const filter = req.headers.filter ? JSON.parse(req.headers.filter) : {};
   knex(path)
