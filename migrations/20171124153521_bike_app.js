@@ -7,6 +7,12 @@ exports.up = function(knex, Promise) {
       t.string('last_name');
       t.string('picture');
       t.string('email');
+      t.string('social_media_id').unique();
+      t.string('social_media_token');
+      t.decimal('avg_speed');
+      t.integer('avg_speed_counter');
+      t.decimal('total_distance');
+      t.integer('calories');
       t.timestamp("created_at").notNullable().defaultTo(knex.fn.now());
       t.timestamp("updated_at").notNullable().defaultTo(knex.fn.now());
     }),
@@ -19,6 +25,8 @@ exports.up = function(knex, Promise) {
         .inTable('user_account');
       t.decimal('current_rating');
       t.integer('favorite_count');
+      t.string('photo_url');
+      t.string('route_preview');
       t.timestamp("created_at").notNullable().defaultTo(knex.fn.now());
       t.timestamp("updated_at").notNullable().defaultTo(knex.fn.now());
     }),
@@ -44,7 +52,7 @@ exports.up = function(knex, Promise) {
       t.decimal('mph');
       t.decimal('time');
       t.decimal('distance');
-      t.integer('calories');
+      t.string('photo_url');
     }),
     knex.schema.createTable('rating', (t) => {
       t.increments('id').primary();            
