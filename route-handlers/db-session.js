@@ -85,9 +85,9 @@ app.post(`/${path}`, async ({ body }, res) => {
 
     knex(path)
       .insert(session)
-      .returning('id')
-      .then(([id]) => {
-        res.send({ sessionId: id });
+      .returning('*')
+      .then(([newSession]) => {
+        res.send(newSession);
       });
   } else {
     res.sendStatus(403);
