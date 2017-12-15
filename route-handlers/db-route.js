@@ -92,7 +92,7 @@ app.post(`/${path}`, async ({ body }, res) => {
         userId,
         routeTitle,
         wayPoints,
-        distance,
+        distance: text,
         route_preview,
       },
       tripStats: {
@@ -102,7 +102,7 @@ app.post(`/${path}`, async ({ body }, res) => {
         imageBase64,
       },
     } = body;
-
+    const distance = Number(text.split(' ')[0]);
     let routeImage = '';
     const first = wayPoints[0].location;
     const last = wayPoints[wayPoints.length - 1].location;
@@ -155,7 +155,6 @@ app.post(`/${path}`, async ({ body }, res) => {
       .insert(newRoute)
       .returning('*')
       .then(([route]) => {
-        console.log(route);
         const mappedWaypoints = wayPoints.map(({
           location: { lat, lng },
           street = null,
