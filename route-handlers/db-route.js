@@ -145,11 +145,11 @@ app.post(`/${path}`, async ({ body }, res) => {
 
     knex(path)
       .insert(route)
-      .returning("id")
-      .then(([id]) => {
+      .returning('*')
+      .then(([route]) => {
         const mappedWaypoints = wayPoints.map(
           ({ location: { lat, lng }, street = null }, count) => ({
-            id_route: id,
+            id_route: route.id,
             lat,
             lng,
             count,
@@ -160,7 +160,7 @@ app.post(`/${path}`, async ({ body }, res) => {
           .insert(mappedWaypoints)
           // .returning('*')
           .then(result => {
-            res.send({ type: "Success!", result, routeId: id });
+            res.send({ type: "Success!", result, routeId: route.id, route });
           })
           .catch(err =>
             res
