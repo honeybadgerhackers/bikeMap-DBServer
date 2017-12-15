@@ -95,6 +95,7 @@ app.post(`/${path}`, async ({ body }, res) => {
         routeTitle,
         wayPoints,
         distance,
+        route_preview,
       },
       tripStats: {
         avgSpeed,
@@ -141,15 +142,17 @@ app.post(`/${path}`, async ({ body }, res) => {
       favorite_count: 0,
       current_rating: rating,
       photo_url: routeImage,
+      route_preview,
+      distance,
     };
 
     knex(path)
       .insert(route)
-      .returning("id")
-      .then(([id]) => {
+      .returning('*')
+      .then(([route]) => {
         const mappedWaypoints = wayPoints.map(
           ({ location: { lat, lng }, street = null }, count) => ({
-            id_route: id,
+            id_route: route.id,
             lat,
             lng,
             count,
@@ -160,7 +163,7 @@ app.post(`/${path}`, async ({ body }, res) => {
           .insert(mappedWaypoints)
           // .returning('*')
           .then(result => {
-            res.send({ type: "Success!", result, routeId: id });
+            res.send({ type: "Success!", result, routeId: route.id, route });
           })
           .catch(err =>
             res
@@ -181,14 +184,23 @@ app.put(`/${path}`, (req, res) => {
 });
 
 app.delete(`/${path}`, (req, res) => {
+  const {id_user_account} = req.body;
   if (Object.keys(req.body).length) {
     knex(path)
       .where(req.body)
-      .del()
-      .then(res.send('Deleted'))
+      .update({id_user_account: 0})
+      .then((updated) => {
+        knex(path)
+        .where({id_user_account})
+        .select()
+        .then((routes) => {
+          res.send(routes);
+        })
+      })
       .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
+  } else {
+    res.send('Please specify row');
   }
-  res.send('Please specify row');
 });
 
 module.exports = app;
