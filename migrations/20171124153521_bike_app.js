@@ -19,6 +19,7 @@ exports.up = function(knex, Promise) {
     knex.schema.createTable('route', (t) => {
       t.increments('id').primary(); 
       t.string('route_name');
+      t.string('display_name');
       t.string('type');
       t.integer('id_user_account')
         .references('id')

@@ -1,21 +1,19 @@
 const express = require('express');
 const knex = require('../db.js');
 const googleCalls = require('../utilities/google');
-var cloudinary = require("cloudinary");
+const cloudinary = require('cloudinary');
 
 const path = 'route';
 
 const app = express();
 
-app.use(express.json());
+app.use(express.json({ limit: '5mb' }));
 
-cloudinary.config({ 
-  cloud_name: 'honeybadgerhackers', 
-  api_key: process.env.CLOUDINARY_API_KEY, 
-  api_secret: process.env.CLOUDINARY_API_SECRET, 
+cloudinary.config({
+  cloud_name: 'honeybadgerhackers',
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-
-
 
 /* eslint-disable no-param-reassign */
 app.get(`/${path}&location`, (req, res) => {
@@ -52,7 +50,7 @@ app.get(`/${path}`, (req, res) => {
     .select()
     .then((results) => {
       res.send(results);
-    }); 
+    });
 });
 
 /*
@@ -72,13 +70,13 @@ app.get(`/${path}&nearby`, (req, res) => {
     .where(function inner() {
       this.where({ count: 0 })
         .whereBetween('lat', [lat - distance, lat + distance])
-        .andWhereBetween('lng', [lng - distance, lng + distance])
+        .andWhereBetween('lng', [lng - distance, lng + distance]);
     })
     .orWhere(function inner() {
       this.whereNot({ count: 0 })
         .andWhereNot({ street: null })
         .whereBetween('lat', [lat - distance, lat + distance])
-        .andWhereBetween('lng', [lng - distance, lng + distance])
+        .andWhereBetween('lng', [lng - distance, lng + distance]);
     })
     .join('route', 'route.id', '=', 'waypoint.id_route')
     .then((results) => {
@@ -132,10 +130,17 @@ app.post(`/${path}`, async ({ body }, res) => {
 
     if (imageBase64 !== '') {
       await cloudinary.uploader.upload(`data:image/jpeg;base64,${imageBase64}`, (result) => {
-        routeImage = result.secure_url;
+        if (result.error) {
+          // eslint-disable-next-line
+          console.error(JSON.stringify(result.error));
+          routeImage = null;
+        } else {
+          routeImage = result.secure_url;
+        }
       });
     }
-    const route = {
+
+    const newRoute = {
       route_name: routeTitle,
       id_user_account: userId,
       type: null,
@@ -147,33 +152,35 @@ app.post(`/${path}`, async ({ body }, res) => {
     };
 
     knex(path)
-      .insert(route)
+      .insert(newRoute)
       .returning('*')
       .then(([route]) => {
-        const mappedWaypoints = wayPoints.map(
-          ({ location: { lat, lng }, street = null }, count) => ({
-            id_route: route.id,
-            lat,
-            lng,
-            count,
-            street
-          })
-        );
-        knex("waypoint")
+        console.log(route);
+        const mappedWaypoints = wayPoints.map(({
+          location: { lat, lng },
+          street = null,
+        }, count) => ({
+          id_route: route.id,
+          lat,
+          lng,
+          count,
+          street,
+        }));
+        knex('waypoint')
           .insert(mappedWaypoints)
           // .returning('*')
-          .then(result => {
-            res.send({ type: "Success!", result, routeId: route.id, route });
+          .then((result) => {
+            res.send({
+              type: 'Success!', result, routeId: route.id, route,
+            });
           })
           .catch(err =>
             res
               .status(400)
-              .send({ text: "Something went wrong!", error: err })
-          );
+              .send({ text: 'Something went wrong!', error: err }));
       })
       .catch(err =>
-        res.status(400).send({ text: "Something went wrong!", error: err })
-      )
+        res.status(400).send({ text: 'Something went wrong!', error: err }));
   } else {
     res.sendStatus(403);
   }
@@ -184,18 +191,18 @@ app.put(`/${path}`, (req, res) => {
 });
 
 app.delete(`/${path}`, (req, res) => {
-  const {id_user_account} = req.body;
+  const { id_user_account } = req.body;
   if (Object.keys(req.body).length) {
     knex(path)
       .where(req.body)
-      .update({id_user_account: 0})
+      .update({ id_user_account: 0 })
       .then((updated) => {
         knex(path)
-        .where({id_user_account})
-        .select()
-        .then((routes) => {
-          res.send(routes);
-        })
+          .where({ id_user_account })
+          .select()
+          .then((routes) => {
+            res.send(routes);
+          });
       })
       .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
   } else {
