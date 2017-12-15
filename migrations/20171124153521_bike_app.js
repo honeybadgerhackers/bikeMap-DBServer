@@ -24,6 +24,7 @@ exports.up = function(knex, Promise) {
         .references('id')
         .inTable('user_account');
       t.decimal('current_rating');
+      t.decimal('distance');      
       t.integer('favorite_count');
       t.string('photo_url');
       t.string('route_preview');
