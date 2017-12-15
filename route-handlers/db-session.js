@@ -13,7 +13,7 @@ const path = 'session';
 
 const app = express();
 
-app.use(express.json());
+app.use(express.json({ limit: '5mb' }));
 
 app.get(`/${path}`, (req, res) => {
   const filter = req.headers.filter ? JSON.parse(req.headers.filter) : {};
