@@ -100,6 +100,7 @@ app.post(`/${path}`, async ({ body }, res) => {
         rating,
         speedCounter,
         imageBase64,
+        routeName,
       },
     } = body;
     const distance = Number(text.split(' ')[0]);
@@ -141,6 +142,7 @@ app.post(`/${path}`, async ({ body }, res) => {
     }
 
     const newRoute = {
+      display_name: routeName,
       route_name: routeTitle,
       id_user_account: userId,
       type: null,
