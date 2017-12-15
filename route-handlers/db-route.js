@@ -95,6 +95,7 @@ app.post(`/${path}`, async ({ body }, res) => {
         routeTitle,
         wayPoints,
         distance,
+        route_preview,
       },
       tripStats: {
         avgSpeed,
@@ -141,6 +142,8 @@ app.post(`/${path}`, async ({ body }, res) => {
       favorite_count: 0,
       current_rating: rating,
       photo_url: routeImage,
+      route_preview,
+      distance,
     };
 
     knex(path)
