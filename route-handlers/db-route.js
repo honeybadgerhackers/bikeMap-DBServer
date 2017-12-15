@@ -181,14 +181,23 @@ app.put(`/${path}`, (req, res) => {
 });
 
 app.delete(`/${path}`, (req, res) => {
+  const {id_user_account} = req.body;
   if (Object.keys(req.body).length) {
     knex(path)
       .where(req.body)
-      .del()
-      .then(res.send('Deleted'))
+      .update({id_user_account: 0})
+      .then((updated) => {
+        knex(path)
+        .where({id_user_account})
+        .select()
+        .then((routes) => {
+          res.send(routes);
+        })
+      })
       .catch(err => res.status(400).send({ text: 'Something went wrong!', error: err }));
+  } else {
+    res.send('Please specify row');
   }
-  res.send('Please specify row');
 });
 
 module.exports = app;
